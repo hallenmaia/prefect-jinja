@@ -32,6 +32,7 @@ plugins:
   - gen-files:
       scripts:
         - docs/gen_ref_pages.py
+        - docs/gen_tutorials_pages.py
   - mkdocstrings:
       handlers:
         python:
@@ -44,10 +45,12 @@ plugins:
             heading_level: 1
       watch:
         - prefect_jinja/
+        - examples/email/README.md
         - README.md
 
 nav:
     - Home: index.md
+    - Blocks: blocks.md
     - Tasks: tasks.md
-    - Flows: flows.md
-
+    - Tutorials:
+        - Email: tutorials/email.md

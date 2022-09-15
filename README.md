@@ -18,7 +18,7 @@
 
 ## Welcome!
 
-Prefect Collection Template contains all the boilerplate that you need to create a Prefect collection.
+`prefect-jinja` is a collection of pre-built Prefect tasks that can be used to quickly build Prefect flows to interact with Jinja.
 
 ## Getting Started
 
@@ -28,7 +28,8 @@ Requires an installation of Python 3.7+.
 
 We recommend using a Python virtual environment manager such as pipenv, conda or virtualenv.
 
-These tasks are designed to work with Prefect 2.0. For more information about how to use Prefect, please refer to the [Prefect documentation](https://orion-docs.prefect.io/).
+These tasks are designed to work with Prefect 2.0. For more information about how to use Prefect, please refer to the 
+[Prefect documentation](https://docs.prefect.io/).
 
 ### Installation
 
@@ -38,30 +39,64 @@ Install `prefect-jinja` with `pip`:
 pip install prefect-jinja
 ```
 
-Then, register to [view the block](https://orion-docs.prefect.io/ui/blocks/) on Prefect Cloud:
+Then, register to [view the block](https://docs.prefect.io/ui/blocks/) on Prefect Cloud:
 
 ```bash
-prefect block register -m prefect_jinja.credentials
+prefect block register -m prefect_jinja.blocks
 ```
 
-Note, to use the `load` method on Blocks, you must already have a block document [saved through code](https://orion-docs.prefect.io/concepts/blocks/#saving-blocks) or [saved through the UI](https://orion-docs.prefect.io/ui/blocks/).
+!!! note "Load Block"
+    To use the `load` method on Blocks, you must already have a block document 
+    [saved through code](https://orion-docs.prefect.io/concepts/blocks/#saving-blocks) or 
+    [saved through the UI](https://orion-docs.prefect.io/ui/blocks/).
 
 ### Write and run a flow
 
+!!! note "Remote storage"
+    We recommend configuring [remote file storage](https://docs.prefect.io/concepts/storage/) for task execution with 
+    `JinjaEnvironmentBlock`. This ensures tasks have access to templates files, particularly when accessing a instance 
+    outside the execution environment.
+
+#### Render templates from a directory
+
+Using the `JinjaEnvironmentBlock` block and the `jinja_render_from_template` function to render an HTML page.
+
 ```python
 from prefect import flow
-from prefect_jinja.tasks import (
-    goodbye_prefect_jinja,
-    hello_prefect_jinja,
-)
-
+from prefect_jinja import JinjaEnvironmentBlock, jinja_render_from_template
 
 @flow
-def example_flow():
-    hello_prefect_jinja
-    goodbye_prefect_jinja
+def example_jinja_render_from_template_flow(username: str):
+    jinja_environment = JinjaEnvironmentBlock(
+        search_path="templates", 
+        namespace={
+            "company_name": "Acme",
+            "company_logo": "https://image.com",
+        }
+    )
+    
+    return jinja_render_from_template(
+        "welcome.html", 
+        jinja_environment, 
+        username=username
+    )
+    
+print(example_jinja_render_from_template_flow(username="Neymar"))
+```
 
-example_flow()
+#### Render templates from a string
+
+Using the `jinja_render_from_string` function to render a string.
+
+```python
+from prefect import flow
+from prefect_jinja import jinja_render_from_string
+
+@flow
+def send_hello_flow(name: str):
+    return jinja_render_from_string("Hello, {{name}}!", name=name)    
+
+print(send_hello_flow(name="Hallen Maia"))
 ```
 
 ## Resources
