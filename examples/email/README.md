@@ -37,15 +37,11 @@ pip install prefect-jinja prefect-email
 
 Then, register to [view blocks](https://docs.prefect.io/ui/blocks/) on Prefect Cloud:
 
-- [Jinja Environment](#jinja-environment):
 ```bash
 prefect block register -m prefect_jinja.blocks
-```
-- [Email Server Credentials](#email-server-credentials):
-```bash
+
 prefect block register -m prefect_email.credentials
 ```
-
 
 ### Project Structure
 
@@ -225,15 +221,11 @@ if __name__ == '__main__':
 
 ### Running
 
-Enter the `flows` directory:
+Enter the `flows` directory. Then run the `send_welcome.py` flows with python:
 
 ```bash
 cd flows
-```
 
-Run `send_welcome.py` flows with python:
-
-```bash
 python send_welcome.py
 ```
 
