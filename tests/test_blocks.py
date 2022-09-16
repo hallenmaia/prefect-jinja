@@ -8,7 +8,7 @@ from prefect_jinja.blocks import JinjaEnvironmentBlock
 class TestJinjaEnvironmentBlock:
     def test_initialize_attr_with_defaults(self):
         jinja_env_block = JinjaEnvironmentBlock()
-        assert jinja_env_block.search_path == "templates"
+        assert jinja_env_block.search_path is None
         assert isinstance(jinja_env_block.namespace, Dict)
 
     def test_initialize_attr_from_kwargs(self):

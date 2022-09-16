@@ -33,7 +33,6 @@ class JinjaEnvironmentBlock(Block):
         description="A dict of variables that are available in every template loaded by the environment.",
     )
     search_path: Optional[str] = Field(
-        default="templates",
         description="A path to the directory that contains the templates. Can be relative or absolute. Relative paths are relative to the running `flow` directory.",
     )
 
