@@ -10,8 +10,6 @@ class JinjaEnvironmentBlock(Block):
     """
     Block to create a template environment.
 
-    Stores the path where the templates files are stored and also the variables that will be available in all templates.
-
     Args:
         namespace (dict): A dict of variables that are available in every template loaded by the environment.
         search_path (str): A path to the directory that contains the templates. Can be relative or absolute.
@@ -42,14 +40,10 @@ class JinjaEnvironmentBlock(Block):
         `search_path` attribute and sets the global variables provided by the `namespace` attribute.
 
         Returns:
-            JinjaEnvironment (Environment): A Jinja environment.
+            A Jinja environment.
 
         Example:
-            Gets a Jinja Environment.
-
             ```python
-            from prefect import flow
-            from prefect_jinja import jinja_render_from_template
             @flow
             def example_get_jinja_environment_flow():
                 env_block = JinjaEnvironmentBlock(
