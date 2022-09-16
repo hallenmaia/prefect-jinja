@@ -67,22 +67,21 @@ from prefect import flow
 from prefect_jinja import JinjaEnvironmentBlock, jinja_render_from_template
 
 @flow
-def example_jinja_render_from_template_flow(username: str):
+def send_welcome_flow(username: str):
     jinja_environment = JinjaEnvironmentBlock(
-        search_path="templates", 
+        search_path="templates",
         namespace={
             "company_name": "Acme",
-            "company_logo": "https://image.com",
         }
     )
     
     return jinja_render_from_template(
-        "welcome.html", 
-        jinja_environment, 
+        "welcome.html",
+        jinja_environment,
         username=username
     )
-    
-print(example_jinja_render_from_template_flow(username="Neymar"))
+
+print(send_welcome_flow(username="Neymar"))
 ```
 
 #### Render templates from a string
@@ -94,10 +93,10 @@ from prefect import flow
 from prefect_jinja import jinja_render_from_string
 
 @flow
-def send_hello_flow(name: str):
-    return jinja_render_from_string("Hello, {{name}}!", name=name)    
+def send_hello_flow(username: str):
+    return jinja_render_from_string("Hello, {{name}}!", username=username)
 
-print(send_hello_flow(name="Robinho"))
+print(send_hello_flow(username="Robinho"))
 ```
 
 ## Resources
