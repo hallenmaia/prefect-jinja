@@ -18,7 +18,8 @@
 
 ## Welcome!
 
-`prefect-jinja` is a collection of pre-built Prefect tasks that can be used to quickly build Prefect flows to interact with Jinja.
+`prefect-jinja` is a collection of pre-built Prefect tasks that can be used to quickly build Prefect flows to interact 
+with [Jinja](https://jinja.palletsprojects.com).
 
 ## Getting Started
 
@@ -52,14 +53,14 @@ prefect block register -m prefect_jinja.blocks
 
 ### Write and run a flow
 
-!!! note "Remote storage"
-    We recommend configuring [remote file storage](https://docs.prefect.io/concepts/storage/) for task execution with 
-    `JinjaEnvironmentBlock`. This ensures tasks have access to templates files, particularly when accessing a instance 
-    outside the execution environment.
-
 #### Render templates from a directory
 
 Using the `JinjaEnvironmentBlock` block and the `jinja_render_from_template` function to render an HTML page.
+
+!!! note "Remote storage"
+    We recommend configuring [remote file storage](https://docs.prefect.io/concepts/storage/) for task execution with 
+    `JinjaEnvironmentBlock` block and the `jinja_render_from_template` function. This ensures tasks have access to 
+    templates files, particularly when accessing a instance outside the execution environment.
 
 ```python
 from prefect import flow
@@ -96,18 +97,21 @@ from prefect_jinja import jinja_render_from_string
 def send_hello_flow(name: str):
     return jinja_render_from_string("Hello, {{name}}!", name=name)    
 
-print(send_hello_flow(name="Hallen Maia"))
+print(send_hello_flow(name="Robinho"))
 ```
 
 ## Resources
 
-If you encounter any bugs while using `prefect-jinja`, feel free to open an issue in the [prefect-jinja](https://github.com/hallenmaia/prefect-jinja) repository.
+If you encounter any bugs while using `prefect-jinja`, feel free to open an issue in the 
+[prefect-jinja](https://github.com/hallenmaia/prefect-jinja) repository.
 
-If you have any questions or issues while using `prefect-jinja`, you can find help in either the [Prefect Discourse forum](https://discourse.prefect.io/) or the [Prefect Slack community](https://prefect.io/slack).
+If you have any questions or issues while using `prefect-jinja`, you can find help in either the 
+[Prefect Discourse forum](https://discourse.prefect.io/) or the [Prefect Slack community](https://prefect.io/slack).
 
 ## Development
 
-If you'd like to install a version of `prefect-jinja` for development, clone the repository and perform an editable install with `pip`:
+If you'd like to install a version of `prefect-jinja` for development, clone the repository and perform an editable 
+install with `pip`:
 
 ```bash
 git clone https://github.com/hallenmaia/prefect-jinja.git
