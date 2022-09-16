@@ -1,72 +1,104 @@
-"""Tasks for interacting with Jinja"""
-from typing import Dict
+"""Tasks for rendering Jinja Templates."""
+from typing import Dict, Union
 
 from jinja2 import Template
 from prefect import task
-from prefect.context import get_run_context
+from prefect.context import get_run_context, FlowRunContext, TaskRunContext
 
 from prefect_jinja.blocks import JinjaEnvironmentBlock
 
 
-def get_template_context(context) -> Dict:
-    return {
-        "context": {
-            "start_time": context.start_time,
-        }
-    }
+def _get_template_context(context: Union[FlowRunContext, TaskRunContext]) -> Dict:
+    """
+    Transforms the context of a running task into a dict to make it available in the template.
+
+    Args:
+        context: The current run context of a task or flow function.
+
+    Returns:
+        A dict of `TaskRunContext`.
+    """
+    return {"context": context.task_run.dict()}
 
 
 @task
 async def jinja_render_from_template(name: str, jinja_environment: JinjaEnvironmentBlock, **kwargs) -> str:
     """
-    Task that performs the rendering of a template file.
+    Task that performs the rendering of a template file based on settings of a `Jinja Environment` block.
+
+    !!! note Context
+        The context of a task will be available in the template via `context` keyword.
 
     Args:
-        name (str): Name of template to load.
-        jinja_environment (JinjaEnvironmentBlock): Block.
-        **kwargs: Other arguments that will be passed to the model as variables.
+        name: Name of template file to render.
+        jinja_environment: A Jinja Environment block.
+        **kwargs (dict): Keywords that will be available as variables in the template.
 
     Raises:
-        TemplateNotFound: If the template does not exist.
+        TemplateNotFound: If the template file does not exist.
         TemplateSyntaxError: If there is a problem with the template.
 
     Returns:
-        str: The rendered template as a string.
+        A string containing the rendered template.
 
     Examples:
-        Render a welcome template to send via email (see the 'prefect-email' collection):
+        Render a welcome template file inside `templates` folder with `company_name` as block variable and `username`
+        as keyword:
         ```python
-        from prefect import flow
-        from prefect_email import EmailServerCredentials, email_send_message
-        from prefect_jinja import jinja_render_from_template
-
         @flow
-        def example_send_welcome_email_flow():
-            env_block = JinjaEnvironmentBlock(search_path="templates", namespace={"sender_mail": "sender@test.com"})
-            email_body = jinja_render_from_template("welcome.html", env_block, name="Test", email="test@test.com")
-            email_server_credentials = EmailServerCredentials(
-                username="your_email_address@gmail.com",
-                password="MUST_be_an_app_password_here!",
+        def send_welcome_flow(username: str):
+            jinja_environment = JinjaEnvironmentBlock(
+                search_path="templates",
+                namespace={
+                    "company_name": "Acme",
+                }
             )
-            subject = email_send_message(
-                email_server_credentials=email_server_credentials,
-                subject="Example Flow Notification using Gmail",
-                msg=email_body,
-                email_to="sender@test.com",
+            return jinja_render_from_template(
+                "welcome.html",
+                jinja_environment,
+                username=username
             )
-        example_send_welcome_email_flow()
+        print(send_welcome_flow(username="Neymar"))
         ```
-
     """
+    context = get_run_context()
     jinja_env = jinja_environment.get_env()
-    template = jinja_env.get_template(name, globals=get_template_context(get_run_context()))
+
+    template = jinja_env.get_template(name, globals=_get_template_context(context))
 
     return await template.render_async(**kwargs)
 
 
 @task
 async def jinja_render_from_string(template_string: str, **kwargs) -> str:
+    """
+    Task that performs the rendering of a string.
+
+    !!! note Context
+        The context of a task will be available in the template via `context` keyword.
+
+    Args:
+        template_string: A string representing a template.
+        **kwargs (dict): Keywords that will be available as variables in the template.
+
+    Raises:
+        TemplateSyntaxError: If there is a problem with the template.
+
+    Returns:
+        A string containing the rendered template.
+
+    Examples:
+        Render a hello with username:
+        ```python
+        @flow
+        def send_hello_flow(username: str):
+            return jinja_render_from_string("Hello, {{name}}!", username=username)
+        print(send_hello_flow(username="Robinho"))
+        ```
+    """
+    context = get_run_context()
+
     template = Template(template_string, enable_async=True)
-    template.globals = get_template_context(get_run_context())
+    template.globals = _get_template_context(context)
 
     return await template.render_async(**kwargs)
