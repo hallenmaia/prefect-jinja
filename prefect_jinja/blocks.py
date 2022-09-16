@@ -1,5 +1,5 @@
-"""A Jinja blocks module"""
-from typing import Dict, Optional, Union
+"""A module to interact with Jinja Environment."""
+from typing import Dict, Optional
 
 from jinja2 import Environment, FileSystemLoader, select_autoescape
 from prefect.blocks.core import Block
@@ -10,16 +10,15 @@ class JinjaEnvironmentBlock(Block):
     """
     Block to create a template environment.
 
-    Instances of this class are used to store the configuration and global objects, and are used to load templates from
-    the file system or other locations.
+    Stores the path where the templates files are stored and also the variables that will be available in all templates.
 
     Args:
         namespace (dict): A dict of variables that are available in every template loaded by the environment.
-        search_path (str): A path to the directory that contains the templates. Can be relative or absolute. Relative
-            paths are relative to the current working directory.
+        search_path (str): A path to the directory that contains the templates. Can be relative or absolute.
+            Relative paths are relative to the running `flow` directory.
 
     Example:
-        Load a environment config:
+        Load a environment block:
         ```python
         from prefect_jinja import JinjaEnvironmentBlock
         block = JinjaEnvironmentBlock.load("BLOCK_NAME")
@@ -35,22 +34,19 @@ class JinjaEnvironmentBlock(Block):
     )
     search_path: Optional[str] = Field(
         default="templates",
-        description="A path to the directory that contains the templates. Can be relative or absolute. Relative paths "
-                    "are relative to the current working directory.",
+        description="A path to the directory that contains the templates. Can be relative or absolute. Relative paths are relative to the running `flow` directory.",
     )
 
     def get_env(self) -> Environment:
         """
-        Creates a template environment with a loader that looks up templates in the `search_path`.
-
-        It also store `namespace` as variables that should be available without needing to pass them to
-        :py:func:`~prefect_jinja.tasks.jinja_render_from_template` task.
+        Creates a Jinja Environment with a loader that searches for template files in the path provided by the
+        `search_path` attribute and sets the global variables provided by the `namespace` attribute.
 
         Returns:
-            Environment: A Jinja environment.
+            JinjaEnvironment (Environment): A Jinja environment.
 
         Example:
-            Gets a Jinja environment.
+            Gets a Jinja Environment.
 
             ```python
             from prefect import flow
@@ -60,9 +56,8 @@ class JinjaEnvironmentBlock(Block):
                 env_block = JinjaEnvironmentBlock(
                     search_path="templates", namespace={"sender_mail": "sender@test.com"}
                 )
-                env = env_block.get_env()
-                return env
-            example_get_jinja_environment_flow()
+                return env_block.get_env()
+            jinja_env = example_get_jinja_environment_flow()
             ```
         """
         loader = FileSystemLoader(self.search_path)
