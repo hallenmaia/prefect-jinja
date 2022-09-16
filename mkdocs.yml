@@ -17,6 +17,7 @@ theme:
     code: Source Code Pro
 extra_css:
     - stylesheets/extra.css
+    - stylesheets/code_select.css
 markdown_extensions:
     - admonition
     - attr_list
@@ -25,6 +26,7 @@ markdown_extensions:
     - meta
     - pymdownx.highlight:
         use_pygments: true
+        pygments_lang_class: true
     - pymdownx.superfences
     - pymdownx.tabbed
 plugins:
@@ -47,7 +49,6 @@ plugins:
         - prefect_jinja/
         - examples/email/README.md
         - README.md
-
 nav:
     - Home: index.md
     - Blocks: blocks.md
